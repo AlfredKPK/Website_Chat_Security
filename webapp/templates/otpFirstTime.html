@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save Your Information</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <!-- External CSS -->
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='KeyGeneration.js') }}"></script>
+</head>
+<body>
+    <div class="login-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <h2 class="text-center">OTP QRCode & Secret Key</h2>
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+        <h4>Please keep these keys in private.</h4>
+        <h6>OTP QR Code:</h6>
+        <img src="{{url_for('static', filename='images/qrcode.png')}}", width='300', height='300'> 
+        <h6>Seccret Key:</h6>
+        <p>{{ secretKey }}</p>
+        <h6>Recovery Key:</h6>
+        <p>{{ recoveryKey }}</p>
+        <form action="/register/otpFirstTime" method="post">
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Confirm</button>
+            </div>
+            <input type="hidden" id="ecdhPublicKey" name="ecdhPublicKey">
+            <input type="hidden" id="name" name="name">
+            <script>
+              const url = new URL(window.location.href);
+              const queryParams = new URLSearchParams(url.search);
+              const username = queryParams.get('username');
+              document.getElementById("name").value = username;
+              keyGeneration(username);
+            </script>
+        </form>
+    </div>
+</body>
+</html>
